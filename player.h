@@ -8,6 +8,12 @@ using namespace std;
 
 class Player {
 
+// Added private variables (Joo);
+private:
+    Board currentboard;
+    Side ourSide;
+    Side theirSide;
+
 public:
     Player(Side side);
     ~Player();

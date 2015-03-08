@@ -12,7 +12,16 @@ Player::Player(Side side) {
     testingMinimax = false;
 
     // Created new initial board instance (Joo)
-    currentboard = Board::Board();
+    this->currentboard = Board();
+    // Keep track of which side our AI is on (Joo)
+    this->ourSide = side;
+    // Keep track of side opponent's AI is on (Joo)
+    if (ourSide == BLACK) {
+        this->theirSide = WHITE;
+    }
+    else {
+        this->theirSide = BLACK;
+    }
 
     /* 
      * TODO: Do any initialization you need to do here (setting up the board,
@@ -47,8 +56,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */ 
     
-
-    if 
+    // Do opponent's move (Joo);
+    this->currentboard.doMove(opponentsMove, this->theirSide);
+    
 
     return NULL;
 }
