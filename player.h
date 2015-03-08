@@ -13,6 +13,7 @@ private:
     Board currentboard;
     Side ourSide;
     Side theirSide;
+//(J)
 
 public:
     Player(Side side);

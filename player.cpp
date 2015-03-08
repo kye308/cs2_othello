@@ -22,6 +22,7 @@ Player::Player(Side side) {
     else {
         this->theirSide = BLACK;
     }
+    //(J)
 
     /* 
      * TODO: Do any initialization you need to do here (setting up the board,
@@ -58,7 +59,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     
     // Do opponent's move (Joo);
     this->currentboard.doMove(opponentsMove, this->theirSide);
-    
+    //(J)
 
     return NULL;
 }
