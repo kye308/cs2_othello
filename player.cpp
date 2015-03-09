@@ -1,4 +1,5 @@
 #include "player.h"
+#include <cstdio>
 
 // edited file
 
@@ -58,29 +59,34 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      */ 
     
     // Do opponent's move (Joo);
-    this->currentboard.doMove(opponentsMove, this->theirSide);
+    if (opponentsMove != NULL) {
+        this->currentboard.doMove(opponentsMove, this->theirSide);
+    }
     //(J)
 
-    // No heuristic function, just do any move (Joo);
+    // No heuristic function, just do first possible move (Joo);
     if (currentboard.isDone() == true) {
         return NULL;
     }
+
+
     if (currentboard.hasMoves(this->ourSide) == true) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Move* tempmove = new Move(i, j);
-                if (currentboard.checkMove(tempmove, this->ourSide)) {
+                if (currentboard.checkMove(tempmove, this->ourSide)) {               
                     currentboard.doMove(tempmove, this->ourSide);
-                    delete tempmove;
-                    return NULL;
+                    return tempmove;
                 }
-                delete tempmove;
+                //delete tempmove;
             }
         }
     }
 
     // otherwise pass
+    currentboard.doMove(NULL, this->ourSide);
     //(J)
+
     return NULL;
 }
 
