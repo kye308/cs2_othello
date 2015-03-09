@@ -83,6 +83,28 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
             }
         }
         //choose first valid move
+    
+        // Choose corner piece if possible
+        for (unsigned int move = 0; move < validMoves.size(); move++) {
+            if (validMoves[move]->x == 0 || validMoves[move]->x == 7){
+                if (validMoves[move]->y == 0 || validMoves[move]->y == 7) {
+                    currentboard.doMove(validMoves[move], this->ourSide);
+                    return validMoves[move];
+                }
+            }
+        }
+
+        // Choose edge piece if possible
+        for (unsigned int move = 0; move < validMoves.size(); move++) {
+            if (validMoves[move]->x == 0 || validMoves[move]->x == 7 ||
+                validMoves[move]->x == 0 || validMoves[move]->y == 7) {
+                currentboard.doMove(validMoves[move], this->ourSide);
+                return validMoves[move];
+            }
+        }
+
+
+        // otherwise just return first move possible
         currentboard.doMove(validMoves[0], this->ourSide);
         return validMoves[0];
     }
