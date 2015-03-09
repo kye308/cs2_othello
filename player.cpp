@@ -96,23 +96,31 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
         // Choose edge piece if possible
         for (unsigned int move = 0; move < validMoves.size(); move++) {
-            if (validMoves[move]->x == 0 || validMoves[move]->x == 7 ||
-                validMoves[move]->x == 0 || validMoves[move]->y == 7) {
+            if (((validMoves[move]->x == 0 || validMoves[move]->x == 7) && (validMoves[move]->y != 1 && validMoves[move]->y != 6)) ||
+                ((validMoves[move]->y == 0 || validMoves[move]->y == 7) && (validMoves[move]->x != 1 && validMoves[move]->y != 6))) {
                 currentboard.doMove(validMoves[move], this->ourSide);
                 return validMoves[move];
             }
         }
 
 
-        // otherwise just return greedily best move possible without looking ahead
+        // otherwise just return greedily best move possible without looking ahead, but skips
+        // spaces diagonal to corners (Not sure if this actually works better or worse though)
         int maxCount = 0;
         unsigned int maxMove = 0;
         for (unsigned int move = 0; move < validMoves.size(); move++) {
-            Board* tempboard = currentboard.copy();
-            tempboard->doMove(validMoves[move], this->ourSide);
-            if (tempboard->count(ourSide) > maxCount) {
-                maxCount = tempboard->count(ourSide);
-                maxMove = move;
+            if (!((validMoves[move]->x == 1 && validMoves[move]->y == 1) || 
+                (validMoves[move]->x == 1 && validMoves[move]->y == 6) ||
+                (validMoves[move]->x == 6 && validMoves[move]->y == 1) ||
+                (validMoves[move]->x == 6 && validMoves[move]->y == 6))) {
+
+                Board* tempboard = currentboard.copy();
+                tempboard->doMove(validMoves[move], this->ourSide);
+
+                if (tempboard->count(ourSide) > maxCount) {
+                    maxCount = tempboard->count(ourSide);
+                    maxMove = move;
+               }
             }
         }
         currentboard.doMove(validMoves[maxMove], ourSide);
