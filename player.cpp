@@ -61,6 +61,26 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     this->currentboard.doMove(opponentsMove, this->theirSide);
     //(J)
 
+    // No heuristic function, just do any move (Joo);
+    if (currentboard.isDone() == true) {
+        return NULL;
+    }
+    if (currentboard.hasMoves(this->ourSide) == true) {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                Move* tempmove = new Move(i, j);
+                if (currentboard.checkMove(tempmove, this->ourSide)) {
+                    currentboard.doMove(tempmove, this->ourSide);
+                    delete tempmove;
+                    return NULL;
+                }
+                delete tempmove;
+            }
+        }
+    }
+
+    // otherwise pass
+    //(J)
     return NULL;
 }
 
