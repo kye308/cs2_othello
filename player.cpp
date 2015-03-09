@@ -1,5 +1,6 @@
 #include "player.h"
 #include <cstdio>
+#include <vector>
 
 // edited file
 
@@ -69,19 +70,24 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         return NULL;
     }
 
+    // find all valid moves
+    vector<Move*> validMoves;
 
     if (currentboard.hasMoves(this->ourSide) == true) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Move* tempmove = new Move(i, j);
-                if (currentboard.checkMove(tempmove, this->ourSide)) {               
-                    currentboard.doMove(tempmove, this->ourSide);
-                    return tempmove;
+                if (currentboard.checkMove(tempmove, this->ourSide)) {
+                    validMoves.push_back(tempmove);               
                 }
-                //delete tempmove;
             }
         }
+        //choose first valid move
+        currentboard.doMove(validMoves[0], this->ourSide);
+        return validMoves[0];
     }
+    
+
 
     // otherwise pass
     currentboard.doMove(NULL, this->ourSide);
