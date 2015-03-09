@@ -82,7 +82,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                 }
             }
         }
-        //choose first valid move
+        //choose move heuristic:
     
         // Choose corner piece if possible
         for (unsigned int move = 0; move < validMoves.size(); move++) {
@@ -104,9 +104,19 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         }
 
 
-        // otherwise just return first move possible
-        currentboard.doMove(validMoves[0], this->ourSide);
-        return validMoves[0];
+        // otherwise just return greedily best move possible without looking ahead
+        int maxCount = 0;
+        unsigned int maxMove = 0;
+        for (unsigned int move = 0; move < validMoves.size(); move++) {
+            Board* tempboard = currentboard.copy();
+            tempboard->doMove(validMoves[move], this->ourSide);
+            if (tempboard->count(ourSide) > maxCount) {
+                maxCount = tempboard->count(ourSide);
+                maxMove = move;
+            }
+        }
+        currentboard.doMove(validMoves[maxMove], ourSide);
+        return validMoves[maxMove];
     }
     
 
