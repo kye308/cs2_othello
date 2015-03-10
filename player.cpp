@@ -82,52 +82,56 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
                 }
             }
         }
+
         //choose move heuristic:
-    
-        // Choose corner piece if possible
-        for (unsigned int move = 0; move < validMoves.size(); move++) {
-            if (validMoves[move]->x == 0 || validMoves[move]->x == 7){
-                if (validMoves[move]->y == 0 || validMoves[move]->y == 7) {
-                    currentboard.doMove(validMoves[move], this->ourSide);
-                    return validMoves[move];
-                }
-            }
-        }
-
-        // Choose edge piece if possible
-        for (unsigned int move = 0; move < validMoves.size(); move++) {
-            if (((validMoves[move]->x == 0 || validMoves[move]->x == 7) && (validMoves[move]->y != 1 && validMoves[move]->y != 6)) ||
-                ((validMoves[move]->y == 0 || validMoves[move]->y == 7) && (validMoves[move]->x != 1 && validMoves[move]->y != 6))) {
-                currentboard.doMove(validMoves[move], this->ourSide);
-                return validMoves[move];
-            }
-        }
-
-
-        // otherwise just return greedily best move possible without looking ahead, but skips
-        // spaces diagonal to corners (Not sure if this actually works better or worse though)
-        int maxCount = 0;
+        int maxCount = -99999;
         unsigned int maxMove = 0;
         for (unsigned int move = 0; move < validMoves.size(); move++) {
-            if (!((validMoves[move]->x == 1 && validMoves[move]->y == 1) || 
+            Board* tempboard = currentboard.copy();
+            tempboard->doMove(validMoves[move], this->ourSide);
+            int moveValue;
+            
+            // Corner case, moveValue increased by 10
+            if (validMoves[move]->x == 0 || validMoves[move]->x == 7){
+                if (validMoves[move]->y == 0 || validMoves[move]->y == 7) {
+                    moveValue = tempboard->count(ourSide) - tempboard->count(theirSide) + 10;
+                }
+            }
+
+            // Edge case, moveValue increased by 2
+            else if (((validMoves[move]->x == 0 || validMoves[move]->x == 7) && (validMoves[move]->y != 1 && validMoves[move]->y != 6)) ||
+                ((validMoves[move]->y == 0 || validMoves[move]->y == 7) && (validMoves[move]->x != 1 && validMoves[move]->y != 6))) {
+                moveValue = tempboard->count(ourSide) - tempboard->count(theirSide) + 2;
+            }
+
+            // Diagonal to corner, moveValue decreased by 5
+            else if (!((validMoves[move]->x == 1 && validMoves[move]->y == 1) || 
                 (validMoves[move]->x == 1 && validMoves[move]->y == 6) ||
                 (validMoves[move]->x == 6 && validMoves[move]->y == 1) ||
                 (validMoves[move]->x == 6 && validMoves[move]->y == 6))) {
+                moveValue = tempboard->count(ourSide) - tempboard->count(theirSide) - 5;
+            }
 
-                Board* tempboard = currentboard.copy();
-                tempboard->doMove(validMoves[move], this->ourSide);
+            // Anywhere in 1st or 6th column/row, decreased by 1
+            else if ((validMoves[move]->x == 1 || validMoves[move]->y == 1 || 
+                      validMoves[move]->x == 6 || validMoves[move]->y == 6)){
+                moveValue = tempboard->count(ourSide) - tempboard->count(theirSide) - 5;
+            }    
+            // otherwise unchanged
+            else {
+                moveValue = tempboard->count(ourSide) - tempboard->count(theirSide);
+            }
 
-                if (tempboard->count(ourSide) > maxCount) {
-                    maxCount = tempboard->count(ourSide);
-                    maxMove = move;
-               }
+            if (moveValue > maxCount) {
+                maxCount = moveValue;
+                maxMove = move;
             }
         }
+
+        // Now, we have best adjusted move, and we do it.
         currentboard.doMove(validMoves[maxMove], ourSide);
         return validMoves[maxMove];
     }
-    
-
 
     // otherwise pass
     currentboard.doMove(NULL, this->ourSide);
