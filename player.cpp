@@ -12,7 +12,7 @@
  */
 Player::Player(Side side) {
     // Will be set to true in test_minimax.cpp.
-    testingMinimax = false;
+    testingMinimax = true;
 
     // Created new initial board instance (Joo)
     this->currentboard = Board();
@@ -253,6 +253,7 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
             }
             
         }
+        currentboard.doMove(best, this->ourSide);
         return best;
 
 
