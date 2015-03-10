@@ -185,7 +185,7 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
             }
 
         }
-        std::cerr << "Minimum move " << minMove << std::endl;
+        // std::cerr << "Minimum move " << minMove << std::endl;
         return valid_comp_moves[minMove];
 
         }
@@ -221,7 +221,7 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
                 }
             }
         }
-        std::cerr << "Valid moves size" << validMoves.size() << std::endl;
+        // std::cerr << "Valid moves size" << validMoves.size() << std::endl;
         int largest_score = -64;
         Move *best = new Move(1, 1);
         // It's not our opponent's turn. I don't have to calculate
@@ -239,7 +239,7 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
                 Board *tempboard = currentboard.copy();
                 tempboard->doMove(best_move, theirSide);
                 int max_val = tempboard->count(ourSide) - tempboard->count(theirSide);
-                std::cerr << max_val << std::endl;
+                // std::cerr << max_val << std::endl;
 
                 if (max_val > largest_score)
                 {
