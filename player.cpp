@@ -62,7 +62,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     
     if (testingMinimax)
              return minimax(opponentsMove, msLeft, 1);
-         
+
     // Do opponent's move (Joo);
     if (opponentsMove != NULL) {
         this->currentboard.doMove(opponentsMove, this->theirSide);
@@ -146,6 +146,11 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
 
 }
 
+void Player::setBoard(Board b)
+{
+    currentboard = b;
+}
+
 Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
 {   
     // Set the clock
@@ -185,7 +190,7 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
             }
 
         }
-        // std::cerr << "Minimum move " << minMove << std::endl;
+
         return valid_comp_moves[minMove];
 
         }
@@ -221,13 +226,13 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
                 }
             }
         }
-        // std::cerr << "Valid moves size" << validMoves.size() << std::endl;
+       
         int largest_score = -64;
         Move *best = new Move(1, 1);
         // It's not our opponent's turn. I don't have to calculate
         // score....this is a pretty bad idea!
         // Actually this might only be reached when depth is not 2...
-        if (depth != minimax_depth)
+        if (depth != minimax_depth) 
         {
 
             for (unsigned int move = 0; move < validMoves.size(); move++)
@@ -239,7 +244,6 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
                 Board *tempboard = currentboard.copy();
                 tempboard->doMove(best_move, theirSide);
                 int max_val = tempboard->count(ourSide) - tempboard->count(theirSide);
-                // std::cerr << max_val << std::endl;
 
                 if (max_val > largest_score)
                 {
