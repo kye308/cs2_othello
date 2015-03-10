@@ -1,6 +1,7 @@
 #include "player.h"
 #include <cstdio>
 #include <vector>
+#include <time.h>
 
 // edited file
 
@@ -59,6 +60,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */ 
     
+    if (testingMinimax)
+             return minimax(opponentsMove, msLeft, 1);
+         
     // Do opponent's move (Joo);
     if (opponentsMove != NULL) {
         this->currentboard.doMove(opponentsMove, this->theirSide);
@@ -66,14 +70,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     //(J)
 
     // No heuristic function, just do first possible move (Joo);
-    if (currentboard.isDone() == true) {
+    if (currentboard.isDone()) {
         return NULL;
     }
 
     // find all valid moves
     vector<Move*> validMoves;
 
-    if (currentboard.hasMoves(this->ourSide) == true) {
+    if (currentboard.hasMoves(this->ourSide)) {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 Move* tempmove = new Move(i, j);
@@ -137,6 +141,119 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
     currentboard.doMove(NULL, this->ourSide);
     //(J)
 
+    return NULL;
+
+
+}
+
+Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
+{   
+    // Set the clock
+    clock_t start = time(0);
+
+    int minimax_depth = 2;
+
+    // SET DEPTH HERE
+    if (depth == minimax_depth)
+    {
+        vector<Move *> valid_comp_moves;
+
+        if (currentboard.hasMoves(this->theirSide))
+        {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    Move* tempmove = new Move(i, j);
+                    if (currentboard.checkMove(tempmove, this->theirSide)) {
+                        valid_comp_moves.push_back(tempmove);               
+                    }
+                }
+            } 
+        
+        // The score we want to minimize
+        int min_count = 64;
+        unsigned int minMove = 0;
+        for (unsigned int move = 0; move < valid_comp_moves.size(); move++)
+        {
+            Board *tempboard = currentboard.copy();
+            tempboard->doMove(valid_comp_moves[move], this->theirSide);
+            int moveValue = tempboard->count(ourSide) - tempboard->count(theirSide);
+
+            if (moveValue < min_count)
+            {
+                min_count = moveValue;
+                minMove = move;
+            }
+
+        }
+        std::cerr << "Minimum move " << minMove << std::endl;
+        return valid_comp_moves[minMove];
+
+        }
+    // No valid moves for computer
+    return NULL;
+    }
+
+
+    if (opponentsMove != NULL)
+    {
+        this->currentboard.doMove(opponentsMove, this->theirSide);
+    }
+
+    // Checking if the board is done
+    if (currentboard.isDone())
+    {
+        return NULL;
+    }
+
+    // Find all valid moves
+    vector<Move *> validMoves;
+
+    if (currentboard.hasMoves(this->ourSide))
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Move *tempmove = new Move(i, j);
+                if (currentboard.checkMove(tempmove, this->ourSide))
+                {
+                    validMoves.push_back(tempmove);
+                }
+            }
+        }
+        std::cerr << "Valid moves size" << validMoves.size() << std::endl;
+        int largest_score = -64;
+        Move *best = new Move(1, 1);
+        // It's not our opponent's turn. I don't have to calculate
+        // score....this is a pretty bad idea!
+        // Actually this might only be reached when depth is not 2...
+        if (depth != minimax_depth)
+        {
+
+            for (unsigned int move = 0; move < validMoves.size(); move++)
+            {
+                int seconds_elapsed = difftime(time(0), start);
+                Move *best_move = minimax(validMoves[move], msLeft - seconds_elapsed, depth + 1);
+                
+
+                Board *tempboard = currentboard.copy();
+                tempboard->doMove(best_move, theirSide);
+                int max_val = tempboard->count(ourSide) - tempboard->count(theirSide);
+                std::cerr << max_val << std::endl;
+
+                if (max_val > largest_score)
+                {
+                    largest_score = max_val;
+                    best = validMoves[move];
+                }
+            }
+            
+        }
+        return best;
+
+
+    }
+    // We have no moves :(
     return NULL;
 }
 
