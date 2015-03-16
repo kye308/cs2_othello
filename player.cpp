@@ -59,14 +59,14 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
      * process the opponent's opponents move before calculating your own move
      */ 
     
-    if (testingMinimax)
-             return minimax(opponentsMove, msLeft, 1);
 
     // Do opponent's move (Joo);
     if (opponentsMove != NULL) {
         this->currentboard.doMove(opponentsMove, this->theirSide);
     }
-    //(J)
+
+    if (testingMinimax)
+             return minimax(opponentsMove, msLeft, 1);
 
     // No heuristic function, just do first possible move (Joo);
     if (currentboard.isDone()) {
@@ -153,206 +153,104 @@ void Player::setBoard(Board b)
 Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
 {   
     // Set the clock
-    clock_t start = time(0);
+    //clock_t start = time(0);
 
-    int minimax_depth = 2;
+    int minimax_depth = 4;
 
-    // SET DEPTH HERE
+    // BASE CASE: Simply return the minimum of the moves, given opponent's move.
     if (depth == minimax_depth)
     {   
-        // depth is even, so we try to minimize the score
-        if (depth % 2 == 0)
-        {
-            vector<Move *> valid_comp_moves;
-            if (currentboard.hasMoves(this->theirSide))
-            {
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) {
-                        Move* tempmove = new Move(i, j);
-                        if (currentboard.checkMove(tempmove, this->theirSide)) {
-                            valid_comp_moves.push_back(tempmove);               
-                        }
-                    }
-                } 
-            
-            // The score we want to minimize
-            int min_count = 64;
-            unsigned int minMove = 0;
-            for (unsigned int move = 0; move < valid_comp_moves.size(); move++)
-            {
-                Board *tempboard = currentboard.copy();
-                tempboard->doMove(valid_comp_moves[move], this->theirSide);
-                int moveValue = tempboard->count(theirSide) - tempboard->count(ourSide);
+        // Base case: return the minimum move.
 
-                if (moveValue < min_count)
-                {
-                    min_count = moveValue;
-                    minMove = move;
-                }
+        // find all valid moves
+        vector<Move*> validMoves;
 
-            }
-            std::cerr << "Minimum move " << minMove << std::endl;
-            return valid_comp_moves[minMove];
-
-            }
-            // No valid moves for computer
-            return NULL;
-        }
-        // Otherwise we try to maximize our score
-        else
-        {
-            vector<Move *> valid_user_moves;
-
-            if (currentboard.hasMoves(ourSide))
-            {
-                for (int i = 0; i < 8; i++) {
-                    for (int j = 0; j < 8; j++) {
-                        Move *tempmove = new Move(i, j);
-                        if (currentboard.checkMove(tempmove, ourSide))
-                        {
-                            valid_user_moves.push_back(tempmove);
-                        }
+        if (currentboard.hasMoves(this->ourSide)) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    Move* tempmove = new Move(i, j);
+                    if (currentboard.checkMove(tempmove, this->ourSide)) {
+                        validMoves.push_back(tempmove);               
                     }
                 }
-
-                // We want to maximize our score
-                int max_count = -64;
-                unsigned int maxMove = 0;
-
-                for (unsigned int move = 0; 
-                    move < valid_user_moves.size(); move++)
-                {
-                    Board *tempboard = currentboard.copy();
-                    tempboard->doMove(valid_user_moves[move], ourSide);
-                    int moveValue = tempboard->count(ourSide) - tempboard->count(theirSide);
-
-                    if (moveValue > max_count)
-                    {
-                        max_count = moveValue;
-                        maxMove = move;
-                    }
-                }   
-                return valid_user_moves[maxMove];
             }
-            // We have no moves
+        }
+
+        else {
             return NULL;
         }
-    }
 
+        //find minimum move:
+        int minCount = 99999;
+        unsigned int minMove = 0;
+        for (unsigned int move = 0; move < validMoves.size(); move++) {
+            Board* tempboard = currentboard.copy();
+            tempboard->doMove(validMoves[move], this->ourSide);
+            int moveValue;
+
+            moveValue = tempboard->count(ourSide) - tempboard->count(theirSide);
+
+            if (moveValue < minCount) {
+                minCount = moveValue;
+                minMove = move;
+            }
+        }
         
-
-
-    if (opponentsMove != NULL)
-    {
-        this->currentboard.doMove(opponentsMove, this->theirSide);
+        return validMoves[minMove];
     }
 
-    // Checking if the board is done
-    if (currentboard.isDone())
-    {
-        return NULL;
-    }
+   
+    else {
+        // Not base case - recurse, and find the maximum values among all child nodes.
 
-    // Find all valid moves
-    vector<Move *> validMoves;
+        // find all valid moves
+        vector<Move*> validMoves;
 
-    // Depth is even, we minimize the opponent's move
-    if (depth % 2 == 0)
-    {   
-        if (currentboard.hasMoves(theirSide))
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    Move *tempmove = new Move(i, j);
-                    if (currentboard.checkMove(tempmove, theirSide))
-                    {
-                        validMoves.push_back(tempmove);
+        if (currentboard.hasMoves(this->ourSide)) {
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    Move* tempmove = new Move(i, j);
+                    if (currentboard.checkMove(tempmove, this->ourSide)) {
+                        validMoves.push_back(tempmove);               
                     }
                 }
             }
+        }
 
-            // The score we want to minimize
-            int min_count = 64;
-            Move *best = NULL;
-            for (unsigned int move = 0; move < validMoves.size(); move++)
-            {
-                int seconds_elapsed = difftime(time(0), start);
-                Move *best_move = minimax(validMoves[move], msLeft - seconds_elapsed, depth + 1);
+        else {
+            currentboard.doMove(NULL, ourSide);
+        }
 
-                Board *tempboard = currentboard.copy();
-                tempboard->doMove(best_move, ourSide);
-                int moveValue = tempboard->count(theirSide) - tempboard->count(ourSide);
 
-                if (moveValue < min_count)
-                {
-                    min_count = moveValue;
-                    best = validMoves[move];
-                }
+        //find maximum move:
+        int maxCount = -99999;
+        unsigned int maxMove = 0;
+        for (unsigned int move = 0; move < validMoves.size(); move++) {
+            Board* tempboard = currentboard.copy();
+            tempboard->doMove(minimax(validMoves[move], msLeft, depth + 1), this->ourSide);
+            int moveValue;
+
+            moveValue = tempboard->count(ourSide) - tempboard->count(theirSide);
+
+            if (moveValue > maxCount) {
+                maxCount = moveValue;
+                maxMove = move;
             }
-            currentboard.doMove(best, this->theirSide);
-            return best;
+        }
+        
+        if (depth == 1) {
+        currentboard.doMove(validMoves[maxMove], ourSide);
+        return validMoves[maxMove];
+        }
+
+        else {
+        return validMoves[maxMove];
         }
     }
 
-
-    // Else we maximize our move
-    else
-    {
-        if (currentboard.hasMoves(this->ourSide))
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    Move *tempmove = new Move(i, j);
-                    if (currentboard.checkMove(tempmove, ourSide))
-                    {
-                        validMoves.push_back(tempmove);
-                    }
-                }
-            }
-            std::cerr << "Valid moves size " << validMoves.size() << std::endl;
-            int largest_score = -64;
-            Move *best = NULL;
-
-            // It's not our opponent's turn. I don't have to calculate
-            // score....this is a pretty bad idea!
-            // Actually this might only be reached when depth is not 2...
-
-            for (unsigned int move = 0; move < validMoves.size(); move++)
-            {
-                int seconds_elapsed = difftime(time(0), start);
-                Move *best_move = minimax(validMoves[move], msLeft - seconds_elapsed, depth + 1);
-                
-
-                Board *tempboard = currentboard.copy();
-                tempboard->doMove(best_move, theirSide);
-                int max_val = tempboard->count(ourSide) - tempboard->count(theirSide);
-                std::cerr << "Max val (ours - theirs)" << max_val << std::endl;
-
-                if (max_val > largest_score)
-                {
-                    largest_score = max_val;
-                    best = validMoves[move];
-                }
-            }
-                
-            
-            currentboard.doMove(best, this->ourSide);
-            return best;
-
-
-        }
-        // We have no moves :(
-        return NULL;
-    }
-    // This shouldn't be reached??
+    // Should not reach here:
     return NULL;
 }
-
-
 
 
 
