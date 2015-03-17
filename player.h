@@ -13,6 +13,11 @@ private:
     Board currentboard;
     Side ourSide;
     Side theirSide;
+
+    static const int CORNER = 10;
+    static const int EDGE = 3;
+    static const int NEAR_CORNER = -15;
+
 //(J)
 
 public:
@@ -22,6 +27,9 @@ public:
     Move *doMove(Move *opponentsMove, int msLeft);
     Move *minimax(Move *opponentsMove, int msLeft, int depth);
     void setBoard(Board b);
+    bool isEdge(Move *m);
+    bool isCorner(Move *m);
+    bool nearCorner(Move *m);
 
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;

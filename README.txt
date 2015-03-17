@@ -4,9 +4,9 @@ Firstly, I'd like to dedicate this AI to the dankest of the dank. I hope the sim
 
 Now, for acknowledgements:
 
-Jonathan Joo - He completed the first half of assignment one, setting up the initial board/player/game files and getting a heuristic function such that the AI can beat simplePlayer a majority of the time.
+Jonathan Joo - He completed the first half of assignment one, setting up the initial board/player/game files and getting a heuristic function such that the AI can beat SimplePlayer a majority of the time.
 
-Kevin Ye - This grandmaster implemented the Minimax Decision tree, and worked on improving the heuristic function. Essentialy, finished up the second half of assignment 2. 
+Kevin Ye - This grandmaster implemented the Minimax Decision tree, and worked on improving the heuristic function. Essentially, finished up the second half of assignment 2. 
 
 
 Improvements to heuristic function:

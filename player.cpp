@@ -87,7 +87,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft) {
         }
 
         //choose move heuristic:
-        int maxCount = -99999;
+        int maxCount = -64;
         unsigned int maxMove = 0;
         for (unsigned int move = 0; move < validMoves.size(); move++) {
             Board* tempboard = currentboard.copy();
@@ -150,6 +150,27 @@ void Player::setBoard(Board b)
     currentboard = b;
 }
 
+bool Player::isCorner(Move *m)
+{
+    return (m->x == 0 && (m->y == 0 || m->y == 7)) || (m->x == 7 && 
+    (m->y == 0 || m->y == 7));
+}
+
+bool Player::isEdge(Move *m)
+{
+    return ((m->x == 0 || m->x == 7) && (m->y != 1 && m->y != 6)) ||
+                ((m->y == 0 || m->y == 7) && (m->x != 1 && m->y != 6));
+}
+
+bool Player::nearCorner(Move *m)
+{
+    return (m->x == 0 && (m->y == 1 || m->y == 6)) ||
+        (m->x == 1 && (m->y == 0 || m->y == 1 || m->y == 6 || m->y == 7)) ||
+        (m->x == 6 && (m->y == 0 || m->y == 1 || m->y == 6 || m->y == 7)) ||
+        (m->x == 7 && (m->y == 1 || m->y == 6));
+}
+
+
 Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
 {   
     // Set the clock
@@ -181,7 +202,7 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
         }
 
         //find minimum move:
-        int minCount = 99999;
+        int minCount = -64;
         unsigned int minMove = 0;
         for (unsigned int move = 0; move < validMoves.size(); move++) {
             Board* tempboard = currentboard.copy();
@@ -197,7 +218,7 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
         }
         
         return validMoves[minMove];
-    }
+    } 
 
    
     else {
@@ -222,8 +243,8 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
         }
 
 
-        //find maximum move:
-        int maxCount = -99999;
+        // find maximum move:
+        int maxCount = -64;
         unsigned int maxMove = 0;
         for (unsigned int move = 0; move < validMoves.size(); move++) {
             Board* tempboard = currentboard.copy();
@@ -232,6 +253,19 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
 
             moveValue = tempboard->count(ourSide) - tempboard->count(theirSide);
 
+            if (isEdge(validMoves[move]))
+            {
+                moveValue += EDGE;
+            }
+            else if (isCorner(validMoves[move]))
+            {
+                moveValue += CORNER;
+            }
+            else if (nearCorner(validMoves[move]))
+            {
+                moveValue += NEAR_CORNER;
+            }
+
             if (moveValue > maxCount) {
                 maxCount = moveValue;
                 maxMove = move;
@@ -239,12 +273,12 @@ Move *Player::minimax(Move *opponentsMove, int msLeft, int depth)
         }
         
         if (depth == 1) {
-        currentboard.doMove(validMoves[maxMove], ourSide);
-        return validMoves[maxMove];
+            currentboard.doMove(validMoves[maxMove], ourSide);
+            return validMoves[maxMove];
         }
 
         else {
-        return validMoves[maxMove];
+            return validMoves[maxMove];
         }
     }
 
